@@ -11,13 +11,11 @@ class Home extends React.Component {
 
     constructor(){
         super();
-        this.usuarioService = new UsuarioService;
+        this.usuarioService = new UsuarioService();
     }
 
     componentDidMount(){
         const usuarioLogado = LocalStorageService.obterItem('_usuario_logado')
-        {/*const usuarioLogadoString = localStorage.getItem('_usuario_logado')
-    const usuarioLogado = JSON.parse(usuarioLogadoString)*/}
   
         this.usuarioService.obterSaldoPorUsuario(usuarioLogado.id)
         .then( response => {
