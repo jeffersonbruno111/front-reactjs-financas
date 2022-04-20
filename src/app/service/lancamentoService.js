@@ -32,6 +32,10 @@ export default class LancamentoService extends ApiService{
         ]
     }
 
+    salvar(lancamento){
+        return this.post('/', lancamento)
+    }
+
     consultar(lancamentoFiltro){
         let param = `?ano=${lancamentoFiltro.ano}`
 
@@ -56,5 +60,9 @@ export default class LancamentoService extends ApiService{
         }
 
         return this.get(param);
+    }
+    
+    deletar(id){
+        return this.delete(`/${id}`)
     }
 }
