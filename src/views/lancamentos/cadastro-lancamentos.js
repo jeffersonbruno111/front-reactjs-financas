@@ -9,6 +9,7 @@ import SelectMenu from "../../components/selectMenu";
 
 import LancamentoService from "../../app/service/lancamentoService";
 import LocalStorageService from '../../app/service/localstorageSevice'
+import { toHaveFocus } from "@testing-library/jest-dom/dist/matchers";
 
 class CadastroLancamentos extends React.Component {
 
@@ -20,7 +21,6 @@ class CadastroLancamentos extends React.Component {
         valor: '',
         tipo: '',
         status: ''
-
     }
 
     constructor() {
@@ -28,7 +28,33 @@ class CadastroLancamentos extends React.Component {
         this.service = new LancamentoService();
     }
 
+    componentDidMount(){
+        const params = this.props.match.params
+
+        if(params.id){
+            this.service.obterPorId(params.id)
+            .then(response => {
+                this.setState( {...response.data})
+            }).catch( error => {
+                messages.mensagemErro(error.response.data)
+            })
+        }
+    }
+
+    botaoSalvar = () => {
+        if(this.state.idUsuario){
+            this.atualizar()
+        }else(
+            this.submit()
+        )
+    }
+
     submit = () => {
+
+        if(!this.state.descricao || !this.state.mes || !this.state.ano || !this.state.valor || !this.state.tipo){
+            messages.mensagemErro("Preencha todos os campos, pois são obrigatórios!")
+            return false
+        }
 
         const usuarioLogado = LocalStorageService.obterItem('_usuario_logado')
         
@@ -38,7 +64,22 @@ class CadastroLancamentos extends React.Component {
         this.service
         .salvar(lancamento)
         .then(response => {
+            this.props.history.push('/consulta-lancamentos')
             messages.mensagemSucesso(`Lançamento de valor ${valor} cadastrado com sucesso!`)
+        }).catch(error => {
+            messages.mensagemErro(error.response.data)
+        })
+    }
+
+    atualizar = () => {
+        const { descricao, valor, mes, ano, tipo, id, idUsuario } = this.state;
+        const lancamento = {descricao, valor, mes, ano, tipo, id, idUsuario }
+
+        this.service
+        .salvar(lancamento)
+        .then(response => {
+            this.props.history.push('/consulta-lancamentos')
+            messages.mensagemSucesso(`Lançamento de valor ${valor} atualizado com sucesso!`)
         }).catch(error => {
             messages.mensagemErro(error.response.data)
         })
@@ -128,10 +169,10 @@ class CadastroLancamentos extends React.Component {
                 <br/>
                 <div className="row">
                     <div className="col-md-6">
-                        <button className="btn btn-success" onClick={this.submit}>
+                        <button className="btn btn-success" onClick={this.botaoSalvar}>
                             Salvar                            
                             </button>
-                        <button className="btn btn-danger">
+                        <button className="btn btn-danger" onClick={e => this.props.history.push('/consulta-lancamentos')}>
                             Cancelar
                             </button>
                     </div>

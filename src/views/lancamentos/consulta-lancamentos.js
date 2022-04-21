@@ -7,6 +7,7 @@ import LancamentosTable from "./lancamentosTable";
 import LancamentoService from "../../app/service/lancamentoService";
 import LocalStorageService from "../../app/service/localstorageSevice";
 
+import currencyFormatter from "currency-formatter";
 import * as messages from "../../components/toastr"
 
 import { Dialog } from 'primereact/dialog'
@@ -57,11 +58,11 @@ class ConsultaLancamentos extends React.Component {
     }
 
     editar = (id) => {
-        console.log('Editando o lançamento: ', id)
+        this.props.history.push(`/atualizar-lancamentos/${id}`)
     }
 
     abrirConfirmacao = (lancamento) => {
-        this.setState({ showConfirmDialog: true, lancamentoDeletar: lancamento, mensagemLancamentoDeletar: `Confirma exclusão do lançamento de valor ${lancamento.valor}?`})
+        this.setState({ showConfirmDialog: true, lancamentoDeletar: lancamento, mensagemLancamentoDeletar: `Confirma exclusão do lançamento de valor ${currencyFormatter.format(lancamento.valor, { locale: 'pt-BR' })}?`})
     }
 
     cancelarDelecao = () => {
@@ -137,7 +138,7 @@ class ConsultaLancamentos extends React.Component {
                             </FormGroup>
                             <br />
                             <button onClick={this.buscar} type="button" className="btn btn-success">Buscar</button>
-                            <button type="button" className="btn btn-danger">Cadastrar</button>
+                            <button onClick={e => this.props.history.push('/cadastro-lancamentos')} type="button" className="btn btn-danger">Cadastrar</button>
                         </div>
                     </div>
                 </div>
@@ -154,7 +155,7 @@ class ConsultaLancamentos extends React.Component {
                 <div>
                     <Dialog header="Confirmar exclusão"
                         visible={this.state.showConfirmDialog}
-                        style={{ width: '20vw' }}
+                        style={{ width: '40vw' }}
                         footer={confirmDialogFooter}
                         modal={true}
                         onHide={() => this.setState({ showConfirmDialog: false })}>
