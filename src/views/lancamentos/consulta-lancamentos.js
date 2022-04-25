@@ -11,7 +11,7 @@ import currencyFormatter from "currency-formatter";
 import * as messages from "../../components/toastr"
 
 import { Dialog } from 'primereact/dialog'
-import {Button} from 'primereact/button'
+import { Button } from 'primereact/button'
 
 class ConsultaLancamentos extends React.Component {
 
@@ -58,11 +58,11 @@ class ConsultaLancamentos extends React.Component {
     }
 
     editar = (id) => {
-        this.props.history.push(`/atualizar-lancamentos/${id}`)
+        this.props.history.push(`/cadastro-lancamentos/${id}`)
     }
 
     abrirConfirmacao = (lancamento) => {
-        this.setState({ showConfirmDialog: true, lancamentoDeletar: lancamento, mensagemLancamentoDeletar: `Confirma exclusão do lançamento de valor ${currencyFormatter.format(lancamento.valor, { locale: 'pt-BR' })}?`})
+        this.setState({ showConfirmDialog: true, lancamentoDeletar: lancamento, mensagemLancamentoDeletar: `Confirma exclusão do lançamento de valor ${currencyFormatter.format(lancamento.valor, { locale: 'pt-BR' })}?` })
     }
 
     cancelarDelecao = () => {
@@ -79,11 +79,28 @@ class ConsultaLancamentos extends React.Component {
                 const lancamentos = this.state.lancamentos;
                 const index = lancamentos.indexOf(this.lancamentoDeletar);
                 lancamentos.splice(index, 1);
-                this.setState({lancamentos: lancamentos, showConfirmDialog: false});
-                messages.mensagemSucesso('Lançamento deletado com sucesso!')
+                this.setState({ lancamentos: lancamentos, showConfirmDialog: false });
+                this.buscar();
+                messages.mensagemSucesso('Lançamento deletado com sucesso!');
             }).catch(erro => {
                 messages.mensagemErro('Ocorreu um erro ao tentar deletar o lançamento')
             });
+
+    }
+
+    alterarStatus = (lancamento, status) => {
+        this.service
+            .alterarStatus(lancamento.id, status)
+            .then(response => {
+                const lancamentos = this.state.lancamentos;
+                const index = lancamentos.indexOf(lancamento);
+                if (index !== -1) {
+                    lancamento['status'] = status;
+                    lancamentos[index] = lancamento;
+                    this.setState({ lancamento });
+                }
+                messages.mensagemSucesso("Status atualizado com sucesso!");
+            })
     }
 
     render() {
@@ -137,8 +154,12 @@ class ConsultaLancamentos extends React.Component {
                                     lista={tipos} />
                             </FormGroup>
                             <br />
-                            <button onClick={this.buscar} type="button" className="btn btn-success">Buscar</button>
-                            <button onClick={e => this.props.history.push('/cadastro-lancamentos')} type="button" className="btn btn-danger">Cadastrar</button>
+                            <button onClick={this.buscar} type="button" className="btn btn-success">
+                            <i className="pi pi-search"></i>
+                            </button>
+                            <button onClick={e => this.props.history.push('/cadastro-lancamentos')} type="button" className="btn btn-primary">
+                            <i className="pi pi-plus"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -148,7 +169,8 @@ class ConsultaLancamentos extends React.Component {
                         <div className="bs-component">
                             <LancamentosTable lancamentos={this.state.lancamentos}
                                 deleteAction={this.abrirConfirmacao}
-                                editAction={this.editar} />
+                                editAction={this.editar} 
+                                alterarStatus={this.alterarStatus}/>
                         </div>
                     </div>
                 </div>
