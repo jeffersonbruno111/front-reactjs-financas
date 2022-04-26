@@ -51,7 +51,11 @@ class ConsultaLancamentos extends React.Component {
         this.service
             .consultar(lancamentoFiltro)
             .then(resposta => {
-                this.setState({ lancamentos: resposta.data })
+                const lista = resposta.data
+                if(lista.length < 1){
+                    messages.mensagemAlert("Nenhum lançamento encontrado para o período informado.")
+                }
+                this.setState({ lancamentos: lista })
             }).catch(error => {
                 console.log(error)
             })
@@ -154,11 +158,11 @@ class ConsultaLancamentos extends React.Component {
                                     lista={tipos} />
                             </FormGroup>
                             <br />
-                            <button onClick={this.buscar} type="button" className="btn btn-success">
-                            <i className="pi pi-search"></i>
+                            <button onClick={this.buscar} type="button" className="btn btn-success" title="Pesquisar Lançamento">
+                                <i className="pi pi-search"></i> Buscar
                             </button>
-                            <button onClick={e => this.props.history.push('/cadastro-lancamentos')} type="button" className="btn btn-primary">
-                            <i className="pi pi-plus"></i>
+                            <button onClick={e => this.props.history.push('/cadastro-lancamentos')} type="button" className="btn btn-primary" title="Cadastrar Lançamento">
+                                <i className="pi pi-plus"></i> Cadastrar
                             </button>
                         </div>
                     </div>
@@ -169,8 +173,8 @@ class ConsultaLancamentos extends React.Component {
                         <div className="bs-component">
                             <LancamentosTable lancamentos={this.state.lancamentos}
                                 deleteAction={this.abrirConfirmacao}
-                                editAction={this.editar} 
-                                alterarStatus={this.alterarStatus}/>
+                                editAction={this.editar}
+                                alterarStatus={this.alterarStatus} />
                         </div>
                     </div>
                 </div>

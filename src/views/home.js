@@ -1,29 +1,29 @@
 import React from "react";
 
 import UsuarioService from "../app/service/usuarioService";
-import LocalStorageService from "../app/service/localstorageSevice";
 import currencyFormatter from "currency-formatter";
+import{ AuthContext } from "../main/provedorAutenticacao"
 
 class Home extends React.Component {
 
-    state= {
+    state = {
         saldo: "Buscando..."
     }
 
-    constructor(){
+    constructor() {
         super();
         this.usuarioService = new UsuarioService();
     }
 
-    componentDidMount(){
-        const usuarioLogado = LocalStorageService.obterItem('_usuario_logado')
-  
+    componentDidMount() {
+        const usuarioLogado = this.context.usuarioAutenticado
+
         this.usuarioService.obterSaldoPorUsuario(usuarioLogado.id)
-        .then( response => {
-            this.setState({saldo: currencyFormatter.format(response.data, { locale: 'pt-BR' })})
-        }).catch(error => {
-            console.error(error.response)
-        })
+            .then(response => {
+                this.setState({ saldo: currencyFormatter.format(response.data, { locale: 'pt-BR' }) })
+            }).catch(error => {
+                console.error(error.response)
+            })
     }
 
     render() {
@@ -37,17 +37,22 @@ class Home extends React.Component {
                 <p className="lead">
                     <a className="btn btn-primary btn-lg"
                         href="#/cadastro-usuarios"
-                        role="button"><i className="fa fa-users"></i>
-                        Cadastrar Usuário
+                        role="button"
+                        title="Adicionar Usuario">
+                        <i className="fa fa-users"></i>
+                        <i className="pi pi-user-plus"></i> Cadastrar Usuário
                     </a>
                     <a className="btn btn-danger btn-lg"
                         href="#/cadastro-lancamentos"
-                        role="button"><i className="fa fa-users"></i>
-                        Cadastrar Lançamento
+                        role="button" title="Cadastrar Lançamento">
+                        <i className="fa fa-users"></i>
+                        <i className="pi pi-plus"></i> Cadastrar Lançamento
                     </a>
                 </p>
             </div>
         )
     }
 }
+Home.contextType = AuthContext;
+
 export default Home

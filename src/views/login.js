@@ -1,11 +1,11 @@
 import React from "react";
 import Card from "../components/card";
 import FormGroup from "../components/form-group";
-import { withRouter} from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 import UsuarioService from "../app/service/usuarioService";
-import LocalStorageService from "../app/service/localstorageSevice";
-import {mensagemErro} from "../components/toastr";
+import { mensagemErro, mensagemSucesso } from "../components/toastr";
+import { AuthContext } from '../main/provedorAutenticacao'
 
 class Login extends React.Component {
 
@@ -14,7 +14,7 @@ class Login extends React.Component {
         senha: ''
     }
 
-    constructor(){
+    constructor() {
         super();
         this.service = new UsuarioService();
     }
@@ -25,58 +25,65 @@ class Login extends React.Component {
             email: this.state.email,
             senha: this.state.senha
         }).then(response => {
-            LocalStorageService.adicionarItem('_usuario_logado', response.data)
+            mensagemSucesso(response.data)
+            this.context.iniciarSessao(response.data)
             this.props.history.push('/home')
-        }).catch( erro => {
+        }).catch(erro => {
             mensagemErro(erro.response.data)
         })
-    }
-
-    prepareCadastrar = () => {
-        this.props.history.push('/cadastro-usuarios')
-    }
-
-    render() {
-        return (
-            <div className="row">
-                <div className="col-md-6" style={{ position: 'relative', left: '300px' }}>
-                    <div className="bs-docs-section">
-                        <Card title="Login">
-                            <div className="row">
-                                <div className="col-lg-12">
-                                    <div className="bs-component">
-                                        <fieldset>
-                                            <FormGroup label="Email: *" htmlFor="exampleInputEmail1">
-                                                <input type="email"
-                                                    value={this.state.email}
-                                                    onChange={e => this.setState({ email: e.target.value })}
-                                                    className="form-control"
-                                                    id="exampleInputEmail1"
-                                                    aria-describedby="emailHelp"
-                                                    placeholder="Digite o email" />
-                                            </FormGroup>
-                                            <FormGroup label="Senha: *" htmlFor="exampleInputPassword1">
-                                                <input type="password"
-                                                    value={this.state.senha}
-                                                    onChange={e => this.setState({ senha: e.target.value })}
-                                                    className="form-control"
-                                                    id="exampleInputPassword1"
-                                                    placeholder="Password"
-                                                />
-                                            </FormGroup>
-                                            <br/>
-                                            <button onClick={this.entrar} className="btn btn-success">Entrar</button>
-                                            <button onClick={this.prepareCadastrar}className="btn btn-danger">Cadastrar</button>
-                                        </fieldset>
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
-                </div>
-            </div>
-        )
-    }
 }
 
-export default withRouter( Login )
+prepareCadastrar = () => {
+    this.props.history.push('/cadastro-usuarios')
+}
+
+render() {
+    return (
+        <div className="row">
+            <div className="col-md-6" style={{ position: 'relative', left: '300px' }}>
+                <div className="bs-docs-section">
+                    <Card title="Login">
+                        <div className="row">
+                            <div className="col-lg-12">
+                                <div className="bs-component">
+                                    <fieldset>
+                                        <FormGroup label="Email: *" htmlFor="exampleInputEmail1">
+                                            <input type="email"
+                                                value={this.state.email}
+                                                onChange={e => this.setState({ email: e.target.value })}
+                                                className="form-control"
+                                                id="exampleInputEmail1"
+                                                aria-describedby="emailHelp"
+                                                placeholder="Digite o email" />
+                                        </FormGroup>
+                                        <FormGroup label="Senha: *" htmlFor="exampleInputPassword1">
+                                            <input type="password"
+                                                value={this.state.senha}
+                                                onChange={e => this.setState({ senha: e.target.value })}
+                                                className="form-control"
+                                                id="exampleInputPassword1"
+                                                placeholder="Password"
+                                            />
+                                        </FormGroup>
+                                        <br />
+                                        <button onClick={this.entrar} className="btn btn-success" title="Entrar">
+                                            <i className="pi pi-sign-in"> Entrar
+                                            </i></button>
+                                        <button onClick={this.prepareCadastrar} className="btn btn-danger" title="Cadastrar novo Usuário">
+                                            <i className="pi pi-user-plus"></i> Cadastre-se
+                                        </button>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    )
+}
+}
+
+Login.contextType = AuthContext;
+
+export default withRouter(Login)
